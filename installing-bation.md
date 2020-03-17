@@ -151,25 +151,37 @@ Copy the pull secret file as /home/corona/pull-secret.json
 Download a copy of your pull secret from [here] (https://cloud.redhat.com/openshift/install/metal/user-provisioned), or obtain directly from your local administrator.
 
 Setup DHCP via DNSMASQ for Baremetal Nodes
-In the Tampa Lab we are using dnsmasq to set static IP addresses on our OpenShift Nodes.
+
+In the Intel Lab we are using dnsmasq to set static IP addresses on our OpenShift Nodes.
+
 Create the DHCP configuration file in the file below.
+
 /etc/dnsmasq.d/baremetal.conf
+
 Include all master and worker nodes in your config. Obtain the MAC addresses (2) for the ports that will be used as the baremetal interfaces.
-On HP nodes - capture the MAC addreses of the first two intel xxv710 ports - you can obtain this information via the ILO.
-On Dell nodes - capture the MAC addresses of the Mellanox CX5 ports - you should be able to obtain this information via the DRAC or at boot time.
+On Lenovo nodes - capture the MAC addreses of the ports that are configured in Arista(TOR). 
+
 # dhcp for baremetal network
   no-dhcp-interface=lo
 interface=baremetal
-  dhcp-range=set:baremetal,10.75.68.198,10.75.68.222,24h
+  dhcp-range=set:baremetal,192.168.1.10,192.168.1.55,24h
   dhcp-option=tag:baremetal,option:netmask,255.255.255.224
-  dhcp-option=tag:baremetal,option:router,10.75.68.193
-  dhcp-option=tag:baremetal,option:dns-server,96.239.250.47
-  dhcp-option=tag:baremetal,option:ntp-server,96.239.250.57
+  dhcp-option=tag:baremetal,option:router,192.168.1.6
+  dhcp-option=tag:baremetal,option:dns-server,36.101.201.3
+  dhcp-option=tag:baremetal,option:ntp-server,x.x.x.x
 
 # Master Nodes
-  dhcp-host=48:df:37:4d:8f:c4,48:df:37:4d:8f:c5,master-0,10.75.68.198,set:baremetal
-  dhcp-host=48:df:37:4d:91:88,48:df:37:4d:91:89,master-1,10.75.68.199,set:baremetal
-  dhcp-host=48:df:37:4d:91:28,48:df:37:4d:91:29,master-2,10.75.68.200,set:baremetal
+  dhcp-host=a4:bf:01:48:8b:72,master-0,192.168.1.10,set:baremetal
+  dhcp-host=a4:bf:01:34:37:28,master-1,192.168.1.11,set:baremetal
+  dhcp-host=3c:fd:fe:af:7a:cd,master-2,192.168.1.12,set:baremetal
+  
+  dhcp-host=3c:fd:fe:a9:4d:29,worker-13,192.168.1.13,set:baremetal
+  dhcp-host=3c:fd:fe:af:79:0d,worker-14,192.168.1.14,set:baremetal
+  dhcp-host=3c:fd:fe:af:79:61,worker-15,192.168.1.15,set:baremetal
+  dhcp-host=3c:fd:fe:af:76:c1,worker-16,192.168.1.16,set:baremetal
+  dhcp-host=a4:bf:01:34:35:76,worker-17,192.168.1.17,set:baremetal
+  dhcp-host=a4:bf:01:26:99:90,worker-18,192.168.1.18,set:baremetal
+ 
 
 Enable and start dnsmasq
 systemctl enable --now dnsmasq
